@@ -1,0 +1,43 @@
+
+name: Build AntiEmojiKeyboard APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+
+      - name: Extract ZIP
+        run: |
+          mkdir source
+          unzip -q "AntiEmojiKeyboard (1).zip" -d source
+
+      - name: Build APK
+        run: |
+          gradle -p source/AntiEmojiKeyboard assembleDebug --no-daemon
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AntiEmojiKeyboard-APK
+          path: source/AntiEmojiKeyboard/app/build/outputs/apk/debug/app-debug.apk
